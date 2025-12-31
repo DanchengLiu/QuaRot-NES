@@ -1,3 +1,25 @@
+# NES experiments
+The modified program is tested against:
+
+CUDA_VISIBLE_DEVICES=0 python main.py --model TheBloke/Llama-2-7B-fp16 --rotate --a_bits 4 --v_bits 4 --k_bits 4 --w_bits 4 --w_clip --bsz 8 --lm_eval --tasks piqa hellaswag --lm_eval_batch_size 8
+
+To run on NES models, try:
+
+For NES-Llama-quantized:
+
+CUDA_VISIBLE_DEVICES=0 python main.py --model [path_to_NES_model]  --rotate --a_bits 4 --v_bits 4 --k_bits 4 --w_bits 4 --w_clip --bsz 8 --lm_eval --tasks [tasks] --lm_eval_batch_size 8
+
+Compare the results with:
+
+CUDA_VISIBLE_DEVICES=0 python main.py --model [path_to_NES_model]  --rotate --a_bits 4 --v_bits 4 --k_bits 4 --w_bits 4 --w_clip --bsz 8 --lm_eval --tasks [tasks] --lm_eval_batch_size 8 --no_quantize
+
+For NES-nGPT-quantized:
+
+CUDA_VISIBLE_DEVICES=0 python main.py --model [path_to_NES_model]  --rotate --a_bits 4 --v_bits 4 --k_bits 4 --w_bits 4 --w_clip --bsz 8 --lm_eval --tasks [tasks] --lm_eval_batch_size 8 --ngpt
+
+Compare the results with:
+
+CUDA_VISIBLE_DEVICES=0 python main.py --model [path_to_NES_model]  --rotate --a_bits 4 --v_bits 4 --k_bits 4 --w_bits 4 --w_clip --bsz 8 --lm_eval --tasks [tasks] --lm_eval_batch_size 8 --no_quantize
 # Fake Quantization in QuaRot
 
 
