@@ -12,73 +12,83 @@ LLAMA_LAYER = transformers.models.llama.modeling_llama.LlamaDecoderLayer
 
 
 def model_type_extractor(model):
-    if isinstance(model, LLAMA_MODEL):
-        return LLAMA_MODEL
-    elif isinstance(model, OPT_MODEL):
-        return OPT_MODEL
-    else:
-        raise ValueError(f'Unknown model type {model}')
+    #if isinstance(model, LLAMA_MODEL):
+    return LLAMA_MODEL
+    #elif isinstance(model, OPT_MODEL):
+    #    return OPT_MODEL
+    #else:
+    #    raise ValueError(f'Unknown model type {model}')
 
 def skip(*args, **kwargs):
     # This is a helper function to save time during the initialization! 
     pass
 
 def get_rope_function_name(model):
-    if isinstance(model, LLAMA_MODEL):
-        return "apply_rotary_pos_emb"
-    raise NotImplementedError
+    #if isinstance(model, LLAMA_MODEL):
+    return "apply_rotary_pos_emb"
+    #raise NotImplementedError
 
 
 def get_layers(model):
-    if isinstance(model, OPT_MODEL):
-        return model.model.decoder.layers
-    if isinstance(model, LLAMA_MODEL):
-        return model.model.layers
-    raise NotImplementedError
+    #if isinstance(model, OPT_MODEL):
+    #    return model.model.decoder.layers
+    #if isinstance(model, LLAMA_MODEL):
+    return model.model.layers
+    #raise NotImplementedError
 
 
-def get_llama(model_name, hf_token):
-    torch.nn.init.kaiming_uniform_ = skip
-    torch.nn.init.uniform_ = skip
-    torch.nn.init.normal_ = skip
-    model = transformers.LlamaForCausalLM.from_pretrained(model_name, torch_dtype='auto',
-                                                          use_auth_token=hf_token,
-                                                          low_cpu_mem_usage=True)
-    model.seqlen = 2048
-    logging.info('---> Loading {} Model with seq_len: {}'.format(model_name, model.seqlen))
-    return model
+# def get_llama(model_name, hf_token):
+#     torch.nn.init.kaiming_uniform_ = skip
+#     torch.nn.init.uniform_ = skip
+#     torch.nn.init.normal_ = skip
+#     model = transformers.LlamaForCausalLM.from_pretrained(model_name, torch_dtype='auto',
+#                                                           use_auth_token=hf_token,
+#                                                           low_cpu_mem_usage=True)
+#     model.seqlen = 2048
+#     logging.info('---> Loading {} Model with seq_len: {}'.format(model_name, model.seqlen))
+#     return model
 
 
 
-def get_opt(model_name):
-    torch.nn.init.kaiming_uniform_ = skip
-    torch.nn.init.uniform_ = skip
-    torch.nn.init.normal_ = skip
-    model = transformers.OPTForCausalLM.from_pretrained(model_name, torch_dtype='auto',
-                                                        low_cpu_mem_usage=True)
-    model.seqlen = model.config.max_position_embeddings
-    logging.info('---> Loading {} Model with seq_len: {}'.format(model_name, model.seqlen))
-    return model
+# def get_opt(model_name):
+#     torch.nn.init.kaiming_uniform_ = skip
+#     torch.nn.init.uniform_ = skip
+#     torch.nn.init.normal_ = skip
+#     model = transformers.OPTForCausalLM.from_pretrained(model_name, torch_dtype='auto',
+#                                                         low_cpu_mem_usage=True)
+#     model.seqlen = model.config.max_position_embeddings
+#     logging.info('---> Loading {} Model with seq_len: {}'.format(model_name, model.seqlen))
+#     return model
 
 
 def get_model(
     model_name, hf_token=None
 ):
-    if 'llama' in model_name:
-        return get_llama(model_name, hf_token)
-    elif 'opt' in model_name:
-        return get_opt(model_name)
-    else:
-        raise ValueError(f'Unknown model {model_name}')
+    from transformers import AutoModelForCausalLM
+    torch.nn.init.kaiming_uniform_ = skip
+    torch.nn.init.uniform_ = skip
+    torch.nn.init.normal_ = skip
+    model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype='auto',
+                                                          use_auth_token=hf_token,
+                                                          low_cpu_mem_usage=True)
+    model.seqlen = 2048
+    logging.info('---> Loading {} Model with seq_len: {}'.format(model_name, model.seqlen))
+    return model
+    # if 'llama' in model_name:
+    #     return get_llama(model_name, hf_token)
+    # elif 'opt' in model_name:
+    #     return get_opt(model_name)
+    # else:
+    #     raise ValueError(f'Unknown model {model_name}')
 
 
 def get_model_type(model):
-    if isinstance(model, OPT_MODEL):
-        model_type = OPT_MODEL
-    elif isinstance(model, LLAMA_MODEL):
-        model_type = LLAMA_MODEL
-    else:
-        raise ValueError(f'Unknown model type {model}')
+    #if isinstance(model, OPT_MODEL):
+    #    model_type = OPT_MODEL
+    #elif isinstance(model, LLAMA_MODEL):
+    model_type = LLAMA_MODEL
+    #else:
+    #    raise ValueError(f'Unknown model type {model}')
     return model_type
 
 def get_embeddings(model, model_type) -> list[torch.nn.Module]:

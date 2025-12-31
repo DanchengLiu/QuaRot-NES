@@ -192,6 +192,7 @@ def gptq_fwrd(model, dataloader, dev, args):
                 ['mlp.up_proj.module', 'mlp.gate_proj.module'],
                 ['mlp.down_proj.module']
             ]
+    rotary_embeddings = {}
     for i in range(len(layers)):
         print(f'\nLayer {i}:', flush=True, end=' ')
         layer = layers[i].to(dev)
@@ -223,7 +224,10 @@ def gptq_fwrd(model, dataloader, dev, args):
             for name in subset:
                 handles.append(subset[name].register_forward_hook(add_batch(name)))
             for j in range(args.nsamples):
-                outs[j] = layer(inps[j].unsqueeze(0), attention_mask=attention_mask, position_ids=position_ids)[0]
+                if i == 0:
+                    # model.model.embed_tokens(inps[j].unsqueeze(0)
+                    rotary_embeddings[j] = model.model.rotary_emb(inps[j].unsqueeze(0), position_ids)
+                outs[j] = layer(inps[j].unsqueeze(0), attention_mask=attention_mask, position_ids=position_ids, position_embeddings = rotary_embeddings[j])[0]
             for h in handles:
                 h.remove()
 
@@ -236,7 +240,7 @@ def gptq_fwrd(model, dataloader, dev, args):
                 gptq[name].free()
 
         for j in range(args.nsamples):
-            outs[j] = layer(inps[j].unsqueeze(0), attention_mask=attention_mask, position_ids=position_ids)[0]
+            outs[j] = layer(inps[j].unsqueeze(0), attention_mask=attention_mask, position_ids=position_ids, position_embeddings = rotary_embeddings[j])[0]
 
         layers[i] = layer.cpu()
         del layer

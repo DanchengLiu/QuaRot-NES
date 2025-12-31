@@ -246,6 +246,7 @@ class ActQuantWrapper(torch.nn.Module):
             x = self.quantizer(x).to(x_dtype)
             self.quantizer.free()
 
+        self.module = self.module.to(x.device)
         x = self.module(x).to(x_dtype)
 
         if self.out_quantizer.bits < 16: #Quantize the output, if needed
